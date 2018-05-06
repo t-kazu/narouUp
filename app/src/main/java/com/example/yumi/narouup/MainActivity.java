@@ -3,13 +3,13 @@ package com.example.yumi.narouup;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.TextView;
 import android.os.AsyncTask;
 
 import java.io.IOException;
 
+import org.jsoup.Connection.Method;
+import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.Validate;
 import org.jsoup.nodes.Document;
@@ -18,25 +18,17 @@ import org.jsoup.select.Elements;
 
 import android.util.Log;
 
-public class MainActivity extends AppCompatActivity implements OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = findViewById(R.id.button);
-
-        button.setOnClickListener(this);
-        //textView.setText( getString(R.string.bookmark,10) );
-    }
-
-
-    @Override
-    public void onClick(View v) {
         TextView textView = (TextView)findViewById(R.id.text_view);
         textView.setText("WORKING");
-        String url = "https://www.google.co.jp/";
+
+        String url = "https://ncode.syosetu.com/novelview/infotop/ncode/n7949cq/";
         Scraping task = new Scraping();
         task.execute(url); //非同期処理開始
     }
@@ -48,8 +40,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             Document document = null;
             String title = null;
             try {
-                document = Jsoup.connect(params[0]).userAgent("Mozilla").get();
-                title = document.title();
+                document = Jsoup.connect(params[0]).get();
+                Log.d("test", document.toString());
+                title = document.select("td").get(8).text();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -60,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         protected void onPostExecute(String result) {
             TextView textView = (TextView)findViewById(R.id.text_view);
             if (result != null){
-                textView.setText(result);
+                textView.setText( getString(R.string.bookmark,result) );
             }else{
                 textView.setText("FAILURE");
             }
