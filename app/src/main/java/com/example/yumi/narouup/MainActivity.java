@@ -18,76 +18,53 @@ import org.jsoup.select.Elements;
 
 import android.util.Log;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Button button = findViewById(R.id.button);
+        Button button = findViewById(R.id.button);
 
-        //button.setOnClickListener(this);
+        button.setOnClickListener(this);
         //textView.setText( getString(R.string.bookmark,10) );
-
-        TextView textView = (TextView)findViewById(R.id.text_view);
-        String url = "https://techbooster.org/";
-
-        try {
-            // HTMLのドキュメントを取得
-            Document document = Jsoup.connect(url).get();
-
-            // titleタグを取得
-            Elements title = document.getElementsByTag("title");
-            // こちらでもtitleを取得できる
-            // String title = document.title();
-
-            // bodyタグをIDから取得
-            Elements body = document.getElementsByTag("body");
-            // こちらでもbodyを取得できる
-            //Element body = document.body();
-
-            textView.setText(title.toString() + "\n" + body.toString());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
 
-    // @Override
-    // public void onClick(View v) {
-    //     textView.setText("WORKING");
-    //     String url = "http://www.google.co.jp/";
-    //     Scraping task = new Scraping();
-    //     task.execute(url); //非同期処理開始
-    // }
+    @Override
+    public void onClick(View v) {
+        TextView textView = (TextView)findViewById(R.id.text_view);
+        textView.setText("WORKING");
+        String url = "https://www.google.co.jp/";
+        Scraping task = new Scraping();
+        task.execute(url); //非同期処理開始
+    }
 
-    // public class Scraping extends AsyncTask<String,Void,String>{
+    public class Scraping extends AsyncTask<String,Void,String>{
 
-    //     private Elements title = null;
+        @Override
+        protected String doInBackground(String... params) {
+            Document document = null;
+            String title = null;
+            try {
+                document = Jsoup.connect(params[0]).userAgent("Mozilla").get();
+                title = document.title();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return title;
+        }
 
-    //     @Override
-    //     protected String doInBackground(String... params) {
-    //         Document document = null;
-    //         try {
-    //             document = Jsoup.connect(params[0]).get();
-    //             title = document.getElementsByTag("title");
-    //         } catch (IOException e) {
-    //             e.printStackTrace();
-    //         }
-    //         return null;
-    //     }
-
-    //     @Override
-    //     protected void onPostExecute(String result) {
-    //         TextView textView = (TextView)findViewById(R.id.text_view);
-    //         if (true){
-    //             textView.setText(title.toString());
-    //         }else{
-    //             textView.setText("FAILURE");
-    //         }
-    //     }
-    // }
+        @Override
+        protected void onPostExecute(String result) {
+            TextView textView = (TextView)findViewById(R.id.text_view);
+            if (result != null){
+                textView.setText(result);
+            }else{
+                textView.setText("FAILURE");
+            }
+        }
+    }
 
 }
