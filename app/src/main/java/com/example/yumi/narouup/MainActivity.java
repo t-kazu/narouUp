@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Button;
 import android.os.AsyncTask;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ import org.json.JSONException;
 
 import android.util.Log;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +30,20 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = (TextView)findViewById(R.id.text_view);
         textView.setText("WORKING");
         startTask();
+
+        Button button = findViewById(R.id.button);
+        button.setOnClickListener(this);
+    }
+
+    public void onClick(View view) {
+        TextView textView = (TextView)findViewById(R.id.text_view);
+        textView.setText("WORKING");
+        startTask();
     }
 
     public void startTask() {
-        String url = "https://api.syosetu.com/novel18api/api/?libtype=2&out=json&of=f&ncode=n9806eq";
+        String ncode = "n9806eq";
+        String url = "https://api.syosetu.com/novel18api/api/?libtype=2&out=json&of=f&ncode=" + ncode;
         Scraping task = new Scraping();
         task.execute(url); //非同期処理開始
     }
