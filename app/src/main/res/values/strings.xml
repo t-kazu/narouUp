@@ -1,4 +1,4 @@
 <resources>
   <string name="app_name">narouUp</string>
-  <string name="bookmark">ブックマーク数は: %1$s</string>
+  <string name="bookmark">ブックマーク数: %1$s</string>
 </resources>

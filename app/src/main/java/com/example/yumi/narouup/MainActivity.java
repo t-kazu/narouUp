@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = (TextView)findViewById(R.id.text_view);
         textView.setText("WORKING");
 
-        String url = "https://ncode.syosetu.com/novelview/infotop/ncode/n7949cq/";
+        String url = "https://ncode.syosetu.com/novelview/infotop/ncode/n3938ch/";
         Scraping task = new Scraping();
         task.execute(url); //非同期処理開始
     }
@@ -42,9 +42,13 @@ public class MainActivity extends AppCompatActivity {
             try {
                 document = Jsoup.connect(params[0]).get();
                 Log.d("test", document.toString());
-                title = document.select("td").get(8).text();
+                if(document.title() == "年齢確認"){
+                    return document.title();
+                } else {
+                    title = document.select("td").get(8).text();
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(); //強制終了
             }
             return title;
         }
