@@ -8,13 +8,14 @@ import android.os.AsyncTask;
 
 import java.io.IOException;
 
-import org.jsoup.Connection.Method;
-import org.jsoup.Connection.Response;
-import org.jsoup.Jsoup;
-import org.jsoup.helper.Validate;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import android.util.Log;
 
@@ -27,8 +28,11 @@ public class MainActivity extends AppCompatActivity {
 
         TextView textView = (TextView)findViewById(R.id.text_view);
         textView.setText("WORKING");
+        startTask();
+    }
 
-        String url = "https://ncode.syosetu.com/novelview/infotop/ncode/n3938ch/";
+    public void startTask() {
+        String url = "https://api.syosetu.com/novel18api/api/?libtype=2&out=json&of=f&ncode=n9806eq";
         Scraping task = new Scraping();
         task.execute(url); //非同期処理開始
     }
@@ -37,18 +41,42 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            Document document = null;
             String title = null;
+            HttpURLConnection con = null;
             try {
-                document = Jsoup.connect(params[0]).get();
-                Log.d("test", document.toString());
-                if(document.title() == "年齢確認"){
-                    return document.title();
-                } else {
-                    title = document.select("td").get(8).text();
+                URL url = new URL(params[0]);
+                con = (HttpURLConnection) url.openConnection();
+                con.connect();
+
+                final int status = con.getResponseCode();
+                if  (status == HttpURLConnection.HTTP_OK) {
+                    InputStream in = con.getInputStream();
+                    InputStreamReader objReader = new InputStreamReader(in);
+                    BufferedReader objBuf = new BufferedReader(objReader);
+                    StringBuffer strBuilder = new StringBuffer();
+                    String sLine;
+                    while((sLine = objBuf.readLine()) != null){
+                        Log.d("test",sLine);
+                        strBuilder.append(sLine);
+                    }
+                    String str_json = strBuilder.toString();
+                    in.close();
+
+                    JSONArray json_array = new JSONArray(str_json);
+                    if (json_array.length() == 2) {
+                        JSONObject json_obj = json_array.getJSONObject(1); //"fav_novel_cnt"
+                        str_json = json_obj.getString("fav_novel_cnt");
+                    }
+                    return str_json;
                 }
             } catch (IOException e) {
                 e.printStackTrace(); //強制終了
+            } catch (JSONException e) {
+		return "Error";
+            } finally {
+                if(con != null){
+                    con.disconnect();
+                }
             }
             return title;
         }
